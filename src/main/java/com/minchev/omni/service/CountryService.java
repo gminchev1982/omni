@@ -1,12 +1,12 @@
 package com.minchev.omni.service;
 
 import com.minchev.omni.entity.Country;
-import com.minchev.omni.error.CountryException;
 import com.minchev.omni.repository.CountryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -28,12 +28,11 @@ public class CountryService {
     @Async
     @Transactional
     @Retryable(
-            value = {CountryException.class},
+            value = {DataAccessException.class},
             maxAttempts = 3,
             backoff = @Backoff(delay = 2000)
     )
     public void saveCountriesAsync(List<Country> countries) {
-        try {
             logger.info("Starting saving process.");
 
             var future =
@@ -42,9 +41,11 @@ public class CountryService {
             future.thenAccept(value -> {
                 logger.info("Data save completed successfully.");
             });
-        } catch (IllegalArgumentException | DataAccessException e) {
-            logger.error("Data save is failed : {}.", e.getMessage());
-            throw new CountryException(e.getMessage());
-        }
     }
+
+    @Recover
+    public void recover(DataAccessException e) {
+        logger.error("Retry failed: {}" , e.getMessage());
+    }
+
 }
