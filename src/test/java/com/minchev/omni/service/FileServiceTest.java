@@ -63,7 +63,9 @@ public class FileServiceTest {
         MultipartFile multipartFile = new MockMultipartFile("sos.json", jsonString.getBytes());
 
         when(mapper.readValue(any(InputStream.class), any(TypeReference.class))).thenReturn(List.of(country));
+
         var result = fileService.parseFileContent(multipartFile);
+
         assertEquals(1, result.get().size());
         assertEquals(country.getName(), result.get().get(0).getName());
     }

@@ -19,8 +19,10 @@ import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
@@ -58,14 +60,12 @@ public class CountryServiceTest {
         country.setCode("aa");
         country.setName("bbb");
 
-        when(countryRepository.saveAll(anyList()))
-                .thenThrow(new DataAccessException("Save failed"){})
-                .thenThrow(new DataAccessException("Save failed"){})
-                .thenThrow(new DataAccessException("Save failed"){});
+        doThrow(new DataAccessResourceFailureException("DB always fails"))
+                .when(countryRepository).saveAll(anyList());
 
         countryService.saveCountriesAsync(List.of(country));
 
-        verify(countryRepository, times(1)).saveAll(anyList());
+        verify(countryRepository, times(3)).saveAll(anyList());
     }
 
 
