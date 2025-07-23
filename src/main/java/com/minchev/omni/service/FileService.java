@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -39,7 +38,7 @@ public class FileService {
         }
 
         try {
-            Path path = Paths.get(storageFolder + "/" + file.getOriginalFilename());
+            var path = Paths.get(storageFolder + "/" + file.getOriginalFilename());
             Files.createDirectories(path.getParent());
             Files.write(path, file.getBytes());
         } catch (IOException e) {
@@ -51,12 +50,14 @@ public class FileService {
     @Async
     public CompletableFuture<List<Country>> parseFileContent(MultipartFile file) {
         try {
-            logger.info("Starting parser process with thread: " + Thread.currentThread().getName());
-            final List<Country> countries = mapper.readValue(file.getInputStream(), new TypeReference<List<Country>>() {});
+            logger.info("Starting parser process.");
+            final var countries =
+                    mapper.readValue(file.getInputStream(), new TypeReference<List<Country>>() {});
+
             return CompletableFuture.completedFuture(countries);
         } catch (IOException e) {
-            logger.error("Failed to parse file content from file " + file.getOriginalFilename());
-            throw new StorageException(e.getMessage());
+            logger.error("Failed to parse file content from file {}.", file.getOriginalFilename());
+            return CompletableFuture.failedFuture(e);
         }
     }
 }

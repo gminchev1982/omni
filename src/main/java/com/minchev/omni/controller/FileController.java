@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 public class FileController {
@@ -29,13 +30,10 @@ public class FileController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) throws IOException {
-        try {
-            fileService.storeFile(file);
-            countryService.saveCountriesAsync(fileService.parseFileContent(file));
-            return ResponseEntity.ok("File uploaded successfully: " + file.getOriginalFilename());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    public String handleFileUpload(@RequestParam("file") MultipartFile file)
+            throws IOException, ExecutionException, InterruptedException {
+        fileService.storeFile(file);
+        countryService.saveCountriesAsync(fileService.parseFileContent(file).get());
+        return "File uploaded successfully: " + file.getOriginalFilename();
     }
 }
