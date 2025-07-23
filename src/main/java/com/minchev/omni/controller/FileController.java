@@ -20,7 +20,6 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 public class FileController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileController.class);
     private final FileService fileService;
     private final CountryService countryService;
 
@@ -31,14 +30,12 @@ public class FileController {
 
     @PostMapping("/upload")
     public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) throws IOException {
-
-
         try {
             fileService.storeFile(file);
             countryService.saveCountriesAsync(fileService.parseFileContent(file));
-
             return ResponseEntity.ok("File uploaded successfully: " + file.getOriginalFilename());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 }

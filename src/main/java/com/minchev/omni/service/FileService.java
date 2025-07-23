@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.minchev.omni.entity.Country;
 import com.minchev.omni.error.StorageException;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -20,7 +21,7 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class FileService {
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FileService.class);
+    private static final Logger logger = LoggerFactory.getLogger(FileService.class);
     private final ObjectMapper mapper;
 
     @Value("${files.storageFolder}")
@@ -47,11 +48,11 @@ public class FileService {
         }
     }
 
-    @Async("taskExecutor")
+    @Async
     public CompletableFuture<List<Country>> parseFileContent(MultipartFile file) {
         try {
             logger.info("Starting parser process with thread: " + Thread.currentThread().getName());
-            final List<Country> countries = mapper.readValue( file.getInputStream(), new TypeReference<List<Country>>() {});
+            final List<Country> countries = mapper.readValue(file.getInputStream(), new TypeReference<List<Country>>() {});
             return CompletableFuture.completedFuture(countries);
         } catch (IOException e) {
             logger.error("Failed to parse file content from file " + file.getOriginalFilename());

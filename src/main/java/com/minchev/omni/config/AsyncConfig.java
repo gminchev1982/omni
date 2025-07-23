@@ -1,5 +1,6 @@
 package com.minchev.omni.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,14 +13,24 @@ import java.util.concurrent.Executor;
 @EnableAsync
 public class AsyncConfig {
 
-    @Bean(name = "taskExecutor")
+    @Value("${executor.core-pool-size}")
+    private int corePoolSize;
+
+    @Value("${executor.max-pool-size}")
+    private int maxPoolSize;
+
+    @Value("${executor.queue-capacity}")
+    private int queueCapacity;
+
+    @Bean
     public Executor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(5);  // Minimum threads
-        executor.setMaxPoolSize(10);  // Max threads
-        executor.setQueueCapacity(50); // Queue size
+        executor.setCorePoolSize(corePoolSize);
+        executor.setMaxPoolSize(maxPoolSize);
+        executor.setQueueCapacity(queueCapacity);
         executor.setThreadNamePrefix("AsyncThread-");
         executor.initialize();
+
         return executor;
     }
 }
