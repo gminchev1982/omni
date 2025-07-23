@@ -32,19 +32,13 @@ public class FileController {
     @PostMapping("/upload")
     public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) throws IOException {
 
-        LOGGER.info("starting upload file");
 
         try {
             fileService.storeFile(file);
-            CompletableFuture<List<Country>> parsedContentFuture = fileService.parseFileContent(file);
-            parsedContentFuture.thenApply(countries-> countryService.saveCountriesConcurrently(countries));
+            countryService.saveCountriesAsync(fileService.parseFileContent(file));
 
             return ResponseEntity.ok("File uploaded successfully: " + file.getOriginalFilename());
-        } catch (StorageException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-
     }
 }

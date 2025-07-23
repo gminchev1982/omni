@@ -30,7 +30,8 @@ public class FileService {
         this.mapper = mapper;
     }
 
-    public boolean storeFile(MultipartFile file) {
+    public void storeFile(MultipartFile file) {
+        logger.info("Starting upload file");
 
         if (file.isEmpty()) {
             throw new StorageException("file is empty");
@@ -44,17 +45,16 @@ public class FileService {
             logger.error("Failed to store file");
             throw new StorageException(e.getMessage());
         }
-
-        return true;
     }
 
     @Async("taskExecutor")
     public CompletableFuture<List<Country>> parseFileContent(MultipartFile file) {
         try {
+            logger.info("Starting parser process with thread: " + Thread.currentThread().getName());
             final List<Country> countries = mapper.readValue( file.getInputStream(), new TypeReference<List<Country>>() {});
             return CompletableFuture.completedFuture(countries);
         } catch (IOException e) {
-            logger.error("Failed to parse file content");
+            logger.error("Failed to parse file content from file " + file.getOriginalFilename());
             throw new StorageException(e.getMessage());
         }
     }
