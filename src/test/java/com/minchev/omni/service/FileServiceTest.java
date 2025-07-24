@@ -6,24 +6,19 @@ import com.minchev.omni.entity.Country;
 import com.minchev.omni.error.StorageException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,7 +30,7 @@ import static org.mockito.Mockito.when;
 public class FileServiceTest {
 
     @InjectMocks
-    private FileService fileService;
+    private FileServiceImpl fileService;
 
     @TempDir
     Path tempDir;
@@ -69,7 +64,7 @@ public class FileServiceTest {
         MultipartFile multipartFile =
                 new MockMultipartFile(nameFile, nameFile, "text/plain", jsonString.getBytes());
 
-        Field storageFolderField = FileService.class.getDeclaredField("storageFolder");
+        Field storageFolderField = FileServiceImpl.class.getDeclaredField("storageFolder");
         storageFolderField.setAccessible(true);
         storageFolderField.set(fileService, tempDir.toString());
 

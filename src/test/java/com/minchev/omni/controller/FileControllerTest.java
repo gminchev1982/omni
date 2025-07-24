@@ -1,15 +1,14 @@
 package com.minchev.omni.controller;
 
-import com.minchev.omni.error.StorageException;
 import com.minchev.omni.service.CountryService;
+import com.minchev.omni.service.CountryServiceImpl;
 import com.minchev.omni.service.FileService;
 
+import com.minchev.omni.service.FileServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Mock;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -27,10 +26,10 @@ public class FileControllerTest {
     private FileController fileController;
 
     @MockitoBean
-    private CountryService countryService;
+    private CountryServiceImpl countryService;
 
     @MockitoBean
-    private FileService fileService;
+    private FileServiceImpl fileService;
 
     @Autowired
     private MockMvc mockMvc;
