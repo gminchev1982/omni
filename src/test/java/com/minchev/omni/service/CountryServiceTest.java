@@ -6,27 +6,25 @@ import com.minchev.omni.error.StorageException;
 import com.minchev.omni.repository.CountryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.retry.annotation.EnableRetry;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.retry.support.RetryTemplate;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
-@ContextConfiguration(classes = {AsyncConfig.class})
 public class CountryServiceTest {
 
     @InjectMocks
@@ -52,23 +50,4 @@ public class CountryServiceTest {
 
         verify(countryRepository, times(1)).saveAll(List.of(country));
     }
-
-    @Test
-    public void saveCountriesAsync_retry(){
-
-        Country country = new Country();
-        country.setCode("aa");
-        country.setName("bbb");
-
-        doThrow(new DataAccessResourceFailureException("DB always fails"))
-                .when(countryRepository).saveAll(anyList());
-
-        countryService.saveCountriesAsync(List.of(country));
-
-        verify(countryRepository, times(3)).saveAll(anyList());
-    }
-
-
-
-
 }

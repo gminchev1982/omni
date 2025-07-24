@@ -13,23 +13,32 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
+
 
 public class FileServiceTest {
 
     @InjectMocks
     private FileService fileService;
+
+    @TempDir
+    Path tempDir;
 
     @Mock
     ObjectMapper mapper;
@@ -45,12 +54,30 @@ public class FileServiceTest {
         String jsonString = "[{\"name\": \"Yemen\", \"code\": \"YE\"}]";
         MultipartFile multipartFile = new MockMultipartFile("sos.json", "".getBytes());
 
-        StorageException exception = assertThrows(StorageException.class
-                , () -> {
+        StorageException exception = assertThrows(StorageException.class, () -> {
                     fileService.storeFile(multipartFile);
         });
 
         assertEquals(exception.getMessage(), "file is empty");
+    }
+
+    @Test
+    public void storeFile_saved() throws IOException, NoSuchFieldException, IllegalAccessException {
+        String jsonString = "[{\"name\": \"Yemen\", \"code\": \"YE\"}]";
+        String nameFile = "sos.json";
+
+        MultipartFile multipartFile =
+                new MockMultipartFile(nameFile, nameFile, "text/plain", jsonString.getBytes());
+
+        Field storageFolderField = FileService.class.getDeclaredField("storageFolder");
+        storageFolderField.setAccessible(true);
+        storageFolderField.set(fileService, tempDir.toString());
+
+        fileService.storeFile(multipartFile);
+
+        File file = new File(tempDir.toString() + "/" + "sos.json");
+
+        assertTrue(file.isFile());
     }
 
     @Test
@@ -77,9 +104,10 @@ public class FileServiceTest {
 
         when(mapper.readValue(any(InputStream.class), any(TypeReference.class))).thenThrow(new IOException());
 
-        var result = fileService.parseFileContent(multipartFile);
+        StorageException storageException = assertThrows(StorageException.class, () -> {
+                fileService.parseFileContent(multipartFile);
+        });
 
-        CompletionException exception = assertThrows(CompletionException.class, result::join);
-        assertTrue(exception.getCause() instanceof IOException);
+        assertTrue(storageException != null);
     }
 }

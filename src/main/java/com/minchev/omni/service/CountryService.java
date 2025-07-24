@@ -32,11 +32,10 @@ public class CountryService {
             maxAttempts = 3,
             backoff = @Backoff(delay = 2000)
     )
-    public void saveCountriesAsync(List<Country> countries) {
-            logger.info("Starting saving process.");
+     public void saveCountriesAsync(List<Country> countries) {
+            logger.info("Starting data save process.");
 
-            var future =
-                    CompletableFuture.completedFuture(countryRepository.saveAll(countries));
+            var future = CompletableFuture.completedFuture(countryRepository.saveAll(countries));
 
             future.thenAccept(value -> {
                 logger.info("Data save completed successfully.");

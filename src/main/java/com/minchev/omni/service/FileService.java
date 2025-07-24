@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.minchev.omni.entity.Country;
 import com.minchev.omni.error.StorageException;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,8 +12,11 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -30,7 +34,7 @@ public class FileService {
         this.mapper = mapper;
     }
 
-    public void storeFile(MultipartFile file) {
+    public boolean storeFile(MultipartFile file) {
         logger.info("Starting upload file");
 
         if (file.isEmpty()) {
@@ -38,9 +42,19 @@ public class FileService {
         }
 
         try {
-            var path = Paths.get(storageFolder + "/" + file.getOriginalFilename());
-            Files.createDirectories(path.getParent());
-            Files.write(path, file.getBytes());
+            var dir = new File(getStorageDir());
+            if (!dir.exists() && !dir.mkdirs()) {
+                throw new StorageException("Failed to store file: Cannot create directory: " + dir);
+            }
+
+            var storageFileName = dir + "/" + file.getOriginalFilename();
+
+            try (FileOutputStream storageOutputStream = new FileOutputStream(storageFileName)) {
+                IOUtils.copy(file.getInputStream(), storageOutputStream);
+                storageOutputStream.flush();
+            }
+
+            return true;
         } catch (IOException e) {
             logger.error("Failed to store file");
             throw new StorageException(e.getMessage());
@@ -57,7 +71,11 @@ public class FileService {
             return CompletableFuture.completedFuture(countries);
         } catch (IOException e) {
             logger.error("Failed to parse file content from file {}.", file.getOriginalFilename());
-            return CompletableFuture.failedFuture(e);
+            throw new StorageException(e.getMessage());
         }
+    }
+
+    private String getStorageDir() {
+        return storageFolder;
     }
 }
