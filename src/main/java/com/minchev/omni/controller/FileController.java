@@ -3,6 +3,8 @@ package com.minchev.omni.controller;
 import com.minchev.omni.service.CountryService;
 import com.minchev.omni.service.FileService;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,11 +25,17 @@ public class FileController {
     }
 
     @PostMapping("/upload")
-    public String handleFileUpload(@RequestParam("file") MultipartFile file)
-            throws IOException, ExecutionException, InterruptedException {
-        fileService.storeFile(file);
-        countryService.saveCountriesAsync(fileService.parseFileContent(file).get());
+    public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) {
 
-        return "File uploaded successfully: " + file.getOriginalFilename();
+        try {
+            fileService.storeFile(file);
+            countryService.saveCountriesAsync(fileService.parseFileContent(file).get());
+
+            return ResponseEntity.ok("File uploaded successfully: " + file.getOriginalFilename());
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to upload file: " + file.getOriginalFilename());
+        }
     }
 }

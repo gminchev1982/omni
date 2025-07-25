@@ -1,10 +1,8 @@
 package com.minchev.omni.controller;
 
-import com.minchev.omni.service.CountryService;
 import com.minchev.omni.service.CountryServiceImpl;
-import com.minchev.omni.service.FileService;
-
 import com.minchev.omni.service.FileServiceImpl;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -33,9 +31,6 @@ public class FileControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @TempDir
-    Path tempDir;
 
     @Test
     public void handleFileUpload_Exception () throws Exception {
