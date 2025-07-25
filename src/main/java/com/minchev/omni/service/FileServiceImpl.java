@@ -31,6 +31,10 @@ public class FileServiceImpl implements FileService {
         this.mapper = mapper;
     }
 
+    /**
+     * Save file
+     * @param file
+     */
     public void storeFile(MultipartFile file) {
         logger.info("Starting upload file");
 
@@ -56,6 +60,11 @@ public class FileServiceImpl implements FileService {
         }
     }
 
+    /**
+     * Async parse file content
+     * @param file
+     * @return CompletableFuture object
+     */
     @Async
     public CompletableFuture<List<Country>> parseFileContent(MultipartFile file) {
         try {

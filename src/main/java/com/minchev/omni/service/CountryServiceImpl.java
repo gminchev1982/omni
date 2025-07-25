@@ -25,6 +25,10 @@ public class CountryServiceImpl implements CountryService {
         this.countryRepository = countryRepository;
     }
 
+    /**
+     * Async save data
+     * @param countries - list of {@link Country}
+     */
     @Async
     @Transactional
     @Retryable(
@@ -42,6 +46,10 @@ public class CountryServiceImpl implements CountryService {
             });
     }
 
+    /**
+     * Get a message after a retry mechanism
+     * @param e
+     */
     @Recover
     public void recover(DataAccessException e) {
         logger.error("Retry failed: {}" , e.getMessage());

@@ -27,6 +27,12 @@ public class ShareServiceImpl implements ShareService {
         this.properties = properties;
     }
 
+    /**
+     * send data to an external server
+     * @param countryList - list of {@link Country}
+     * @return - String
+     * @throws Exception
+     */
     @Override
     public ResponseEntity<String> shareData(List<Country> countryList) throws Exception {
         try {
