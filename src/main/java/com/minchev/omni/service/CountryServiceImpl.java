@@ -48,7 +48,7 @@ public class CountryServiceImpl implements CountryService {
 
     /**
      * Get a message after a retry mechanism
-     * @param e
+     * @param e - DataAccessException
      */
     @Recover
     public void recover(DataAccessException e) {
