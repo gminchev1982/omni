@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -30,11 +31,11 @@ public class ShareServiceImpl implements ShareService {
     /**
      * send data to an external server
      * @param countryList - list of {@link Country}
-     * @return - String
-     * @throws Exception
+     * @return - ResponseEntity<String>
+     * @throws - HttpServerErrorException
      */
     @Override
-    public ResponseEntity<String> shareData(List<Country> countryList) throws Exception {
+    public ResponseEntity<String> shareData(List<Country> countryList) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.set(HEADER_X_API_KEY, properties.getKey());
@@ -42,9 +43,9 @@ public class ShareServiceImpl implements ShareService {
             HttpEntity<String> httpEntity = new HttpEntity<>(countryList.toString(), headers);
 
             return restTemplate.exchange(properties.getUrl(), HttpMethod.POST, httpEntity, String.class);
-        } catch (Exception e) {
-            logger.error("Server is not responded!");
-            throw new Exception(e.getMessage());
+        } catch (HttpServerErrorException e) {
+            logger.error("Server is not responded:");
+            throw new RuntimeException("send");
         }
     }
 }

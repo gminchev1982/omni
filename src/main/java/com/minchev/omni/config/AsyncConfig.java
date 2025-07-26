@@ -13,13 +13,13 @@ import java.util.concurrent.Executor;
 @EnableAsync
 public class AsyncConfig {
 
-    @Value("${executor.core-pool-size}")
+    @Value("${async.executor.core-pool-size}")
     private int corePoolSize;
 
-    @Value("${executor.max-pool-size}")
+    @Value("${async.executor.max-pool-size}")
     private int maxPoolSize;
 
-    @Value("${executor.queue-capacity}")
+    @Value("${async.executor.queue-capacity}")
     private int queueCapacity;
 
     @Bean

@@ -5,6 +5,9 @@ import com.minchev.omni.repository.CountryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
@@ -44,6 +47,11 @@ public class CountryServiceImpl implements CountryService {
             future.thenAccept(value -> {
                 logger.info("Data save completed successfully.");
             });
+    }
+
+    @Override
+    public List<Country> getCountyByPage() {
+        return countryRepository.findBy( PageRequest.of(0, 10));
     }
 
     /**
