@@ -1,28 +1,21 @@
 package com.minchev.omni.service;
 
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.minchev.omni.config.ShareConfigProperties;
 import com.minchev.omni.dto.CountryShareDto;
-import com.minchev.omni.error.FileException;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.wiremock.spring.EnableWireMock;
 
 import java.util.List;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
-
 
 @SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableWireMock
@@ -45,7 +38,7 @@ public class ShareServiceTest {
     }
 
     @Test
-    public void shareData() {
+    public void shareData_serverRespond_200() {
         mockServer.expect(requestTo("http://localhost/share")).andRespond(withSuccess());
 
         var result = shareService.shareData(List.of(new CountryShareDto()));
@@ -54,7 +47,7 @@ public class ShareServiceTest {
     }
 
     @Test
-    public void shareData_withException() {
+    public void shareData_serverNotRespond_500() {
         mockServer.expect(requestTo("http://localhost/share")).andRespond(withServerError());
 
         var result = shareService.shareData(List.of(new CountryShareDto()));

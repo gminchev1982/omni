@@ -21,6 +21,9 @@ public class ShareServiceImpl implements ShareService {
     private final RestTemplate restTemplate;
     private final ShareConfigProperties properties;
 
+    private HttpHeaders headers;
+    private HttpEntity<String> httpEntity;
+
     public ShareServiceImpl(RestTemplate restTemplate, ShareConfigProperties properties) {
         this.restTemplate = restTemplate;
         this.properties = properties;
@@ -34,13 +37,12 @@ public class ShareServiceImpl implements ShareService {
      */
     @Override
     public ResponseEntity<String> shareData(List<CountryShareDto> countryList) {
+        return call(HttpMethod.POST, httpEntity);
+    }
+
+    private ResponseEntity<String> call(HttpMethod httpMethod, HttpEntity<String> httpEntity) {
         try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.set(HEADER_X_API_KEY, properties.getKey());
-
-            HttpEntity<String> httpEntity = new HttpEntity<>(countryList.toString(), headers);
-
-            return restTemplate.exchange(properties.getUrl(), HttpMethod.POST, httpEntity, String.class);
+            return restTemplate.exchange(properties.getUrl(), httpMethod, httpEntity, String.class);
         } catch (HttpServerErrorException e) {
             logger.error("Server is not responded:" + e.getMessage());
             return ResponseEntity
