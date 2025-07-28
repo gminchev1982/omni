@@ -2,8 +2,8 @@ package com.minchev.omni.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.minchev.omni.entity.Country;
-import com.minchev.omni.error.StorageException;
+import com.minchev.omni.dto.CountryDto;
+import com.minchev.omni.error.FileException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -49,7 +49,7 @@ public class FileServiceTest {
         String jsonString = "[{\"name\": \"Yemen\", \"code\": \"YE\"}]";
         MultipartFile multipartFile = new MockMultipartFile("sos.json", "".getBytes());
 
-        StorageException exception = assertThrows(StorageException.class, () -> {
+        FileException exception = assertThrows(FileException.class, () -> {
                     fileService.storeFile(multipartFile);
         });
 
@@ -76,8 +76,8 @@ public class FileServiceTest {
     }
 
     @Test
-    public void parseFileContent() throws ExecutionException, InterruptedException, IOException {
-        Country country = new Country();
+    public void parseFileContent_done() throws ExecutionException, InterruptedException, IOException {
+        CountryDto country = new CountryDto();
         country.setCode("YE");
         country.setName("Yemen");
 
@@ -93,13 +93,13 @@ public class FileServiceTest {
     }
 
     @Test
-    public void parseFileContent_Exception() throws IOException, ExecutionException, InterruptedException {
+    public void parseFileContent_wrongData_Exception() throws IOException, ExecutionException, InterruptedException {
         String jsonString = "[{\"name\": \"Yemen\", \"code\": \"YE\"}]";
         MultipartFile multipartFile = new MockMultipartFile("sos.json", jsonString.getBytes());
 
         when(mapper.readValue(any(InputStream.class), any(TypeReference.class))).thenThrow(new IOException());
 
-        StorageException storageException = assertThrows(StorageException.class, () -> {
+        FileException storageException = assertThrows(FileException.class, () -> {
                 fileService.parseFileContent(multipartFile);
         });
 

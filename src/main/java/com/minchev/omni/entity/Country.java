@@ -16,6 +16,14 @@ public class Country {
     @Column( nullable = false)
     private String code;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }

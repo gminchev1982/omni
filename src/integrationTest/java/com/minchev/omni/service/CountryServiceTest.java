@@ -1,6 +1,7 @@
 package com.minchev.omni.service;
 
 
+import com.minchev.omni.dto.CountryDto;
 import com.minchev.omni.entity.Country;
 import com.minchev.omni.repository.CountryRepository;
 import org.junit.Before;
@@ -46,7 +47,7 @@ public class CountryServiceTest {
     @Test
     public void saveCountriesAsync_dataIsNotValidate_startRetryProcess(){
 
-        Country country = new Country();
+        CountryDto country = new CountryDto();
         country.setCode(null);
         country.setName(null);
 

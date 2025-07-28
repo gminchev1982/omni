@@ -1,13 +1,13 @@
 package com.minchev.omni.service;
 
+import com.minchev.omni.dto.CountryDto;
 import com.minchev.omni.entity.Country;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface CountryService {
 
-    void saveCountriesAsync(List<Country> countries);
+    void saveCountriesAsync(List<CountryDto> countries);
 
-    List<Country> getCountyByPage();
+    List<Country> getCountries();
 }

@@ -1,6 +1,7 @@
 package com.minchev.omni.service;
 
 import com.minchev.omni.config.ShareConfigProperties;
+import com.minchev.omni.dto.CountryShareDto;
 import com.minchev.omni.entity.Country;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,7 @@ public class ShareServiceImpl implements ShareService {
      * @throws - HttpServerErrorException
      */
     @Override
-    public ResponseEntity<String> shareData(List<Country> countryList) {
+    public ResponseEntity<String> shareData(List<CountryShareDto> countryList) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.set(HEADER_X_API_KEY, properties.getKey());
@@ -45,7 +46,7 @@ public class ShareServiceImpl implements ShareService {
             return restTemplate.exchange(properties.getUrl(), HttpMethod.POST, httpEntity, String.class);
         } catch (HttpServerErrorException e) {
             logger.error("Server is not responded:");
-            throw new RuntimeException("send");
+            throw new RuntimeException("Server is down!");
         }
     }
 }
