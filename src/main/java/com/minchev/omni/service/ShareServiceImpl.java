@@ -5,10 +5,7 @@ import com.minchev.omni.dto.CountryShareDto;
 import com.minchev.omni.entity.Country;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -45,8 +42,10 @@ public class ShareServiceImpl implements ShareService {
 
             return restTemplate.exchange(properties.getUrl(), HttpMethod.POST, httpEntity, String.class);
         } catch (HttpServerErrorException e) {
-            logger.error("Server is not responded:");
-            throw new RuntimeException("Server is down!");
+            logger.error("Server is not responded:" + e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("server is not respond.");
         }
     }
 }
