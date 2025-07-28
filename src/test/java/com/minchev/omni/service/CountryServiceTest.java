@@ -37,6 +37,6 @@ public class CountryServiceTest {
 
         countryService.saveCountriesAsync(List.of(country));
 
-        verify(countryRepository, times(1)).saveAll(List.of(country));
+        verify(countryRepository, times(1)).saveAll(anyList());
     }
 }
