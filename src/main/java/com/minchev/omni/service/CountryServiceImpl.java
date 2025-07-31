@@ -21,6 +21,7 @@ import java.util.concurrent.CompletableFuture;
 public class CountryServiceImpl implements CountryService {
 
     private static final Logger logger = LoggerFactory.getLogger(CountryServiceImpl.class);
+
     private final CountryRepository countryRepository;
 
     public CountryServiceImpl(CountryRepository countryRepository) {
@@ -29,6 +30,7 @@ public class CountryServiceImpl implements CountryService {
 
     /**
      * Async save data
+     *
      * @param countries - list of {@link Country}
      */
     @Async
@@ -40,7 +42,6 @@ public class CountryServiceImpl implements CountryService {
     )
     @Override
     public CompletableFuture<List<Country>> saveCountriesAsync(List<Country> countries) {
-
         logger.info("Starting data save process.");
         var future = CompletableFuture.completedFuture(countryRepository.saveAll(countries));
 
@@ -56,15 +57,15 @@ public class CountryServiceImpl implements CountryService {
         return countryRepository.getCountryShareList(pageable);
     }
 
-
     /**
+     * catch retry error
      *
      * @param e - DataAccessException
      * @return CompletableFuture faild
      */
     @Recover
     public CompletableFuture<List<Country>> recover(DataAccessException e) {
-        logger.error("Retry is failed: {}" , e.getMessage());
+        logger.error("Retry is failed: {}", e.getMessage());
         return CompletableFuture.failedFuture(e);
     }
 }

@@ -34,6 +34,7 @@ public class FileServiceImpl implements FileService {
 
     /**
      * Save file
+     *
      * @param file
      */
     public void storeFile(MultipartFile file) {
@@ -63,6 +64,7 @@ public class FileServiceImpl implements FileService {
 
     /**
      * Async parse file content
+     *
      * @param file
      * @return CompletableFuture object
      */
@@ -71,7 +73,8 @@ public class FileServiceImpl implements FileService {
         try {
             logger.info("Starting parser process.");
             final var countries =
-                    mapper.readValue(file.getInputStream(), new TypeReference<List<Country>>() {});
+                    mapper.readValue(file.getInputStream(), new TypeReference<List<Country>>() {
+                    });
 
             return CompletableFuture.completedFuture(countries);
         } catch (IOException e) {
