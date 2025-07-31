@@ -73,8 +73,7 @@ public class FileServiceImpl implements FileService {
         try {
             logger.info("Starting parser process.");
             final var countries =
-                    mapper.readValue(file.getInputStream(), new TypeReference<List<Country>>() {
-                    });
+                    mapper.readValue(file.getInputStream(), new TypeReference<List<Country>>() {});
 
             return CompletableFuture.completedFuture(countries);
         } catch (IOException e) {
