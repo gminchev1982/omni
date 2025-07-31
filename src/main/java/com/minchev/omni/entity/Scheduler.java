@@ -19,6 +19,14 @@ public class Scheduler {
 
     private int currentPage;
 
+    public Scheduler() {
+    }
+
+    public Scheduler(String key, int currentPage) {
+        this.key = key;
+        this.currentPage = currentPage;
+    }
+
     public Long getId() {
         return id;
     }

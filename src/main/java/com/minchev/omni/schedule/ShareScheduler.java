@@ -61,16 +61,7 @@ public class ShareScheduler {
 
     private Scheduler getScheduler() {
         Optional<Scheduler> optionalScheduler = schedulerRepository.findByKey(SCHEDULER_SHARE_KEY);
-        final Scheduler schedule;
-        if (optionalScheduler.isPresent()) {
-            schedule = optionalScheduler.get();
 
-        } else {
-            schedule = new Scheduler();
-            schedule.setCurrentPage(PAGE_DEFAULT);
-            schedule.setKey(SCHEDULER_SHARE_KEY);
-
-        }
-        return schedule;
+        return optionalScheduler.isPresent() ? optionalScheduler.get() : new Scheduler(SCHEDULER_SHARE_KEY, PAGE_DEFAULT);
     }
 }
