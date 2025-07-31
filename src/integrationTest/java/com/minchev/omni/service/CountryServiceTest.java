@@ -1,49 +1,74 @@
 package com.minchev.omni.service;
 
-
-import com.minchev.omni.dto.CountryDto;
+import com.minchev.omni.entity.Country;
 import com.minchev.omni.repository.CountryRepository;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.retry.annotation.EnableRetry;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@RunWith(SpringRunner.class)
+
+@SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableRetry
-@SpringBootTest
+@EnableAsync
+@ActiveProfiles("test")
+@RunWith(SpringRunner.class)
 public class CountryServiceTest {
 
     @Autowired
     private CountryService countryService;
 
-    @MockitoBean
+    @MockitoSpyBean
     private CountryRepository countryRepository;
 
-
-    @Before
+    @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
     }
 
-    public void saveCountriesAsync_dataIsNotValidate_startRetryProcess(){
-    //TODO fix
-        CountryDto country = new CountryDto();
+    @Test
+    public void saveCountriesAsync_startRetryProcess() throws ExecutionException, InterruptedException {
+        Country country = new Country();
         country.setCode(null);
         country.setName(null);
 
-        countryService.saveCountriesAsync(List.of(country));
+        var exception = assertThrows(CompletionException.class, () -> {
+            var exp =  countryService.saveCountriesAsync(List.of(country));
+            exp.join();
+        });
 
-        verify(countryRepository, times(3)).saveAll(anyList());
+       // assertNotNull(exception.getMessage());
+        verify(countryRepository, Mockito.times(3)).saveAll(anyList());
+    }
+
+    @Test
+    public void saveCountriesAsync_withCorrectData_return() throws ExecutionException, InterruptedException {
+        Country country = new Country();
+        country.setCode("Sps");
+        country.setName("sps");
+
+        var exp =  countryService.saveCountriesAsync(List.of(country));
+        exp.join();
+
+        assertEquals(exp.get().size(), 1);
     }
 
 }

@@ -1,12 +1,12 @@
 package com.minchev.omni.service;
 
-import com.minchev.omni.dto.CountryDto;
+import com.minchev.omni.dto.CountryShareDto;
 import com.minchev.omni.entity.Country;
-import com.minchev.omni.mapper.CountryMapper;
 import com.minchev.omni.repository.CountryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
@@ -22,11 +22,9 @@ public class CountryServiceImpl implements CountryService {
 
     private static final Logger logger = LoggerFactory.getLogger(CountryServiceImpl.class);
     private final CountryRepository countryRepository;
-    private final CountryMapper countryMapper;
 
-    public CountryServiceImpl(CountryRepository countryRepository, CountryMapper countryMapper) {
+    public CountryServiceImpl(CountryRepository countryRepository) {
         this.countryRepository = countryRepository;
-        this.countryMapper = countryMapper;
     }
 
     /**
@@ -40,31 +38,33 @@ public class CountryServiceImpl implements CountryService {
             maxAttempts = 3,
             backoff = @Backoff(delay = 2000)
     )
-    public void saveCountriesAsync(List<CountryDto> countries) {
-        logger.info("Starting data save process.");
+    @Override
+    public CompletableFuture<List<Country>> saveCountriesAsync(List<Country> countries) {
 
-        var countryList = countryMapper.toCountryList(countries);
-        var future =
-                CompletableFuture.completedFuture(countryRepository.saveAll(countryList));
+        logger.info("Starting data save process.");
+        var future = CompletableFuture.completedFuture(countryRepository.saveAll(countries));
 
         future.thenAccept(value -> {
             logger.info("Data save completed successfully.");
         });
+
+        return future;
     }
 
     @Override
-    public List<Country> getCountries() {
-        return countryRepository.findAll();
+    public List<CountryShareDto> getCountryShareList(Pageable pageable) {
+        return countryRepository.getCountryShareList(pageable);
     }
+
 
     /**
-     * Get a message after a retry mechanism
+     *
      * @param e - DataAccessException
+     * @return CompletableFuture faild
      */
     @Recover
-    public void recover(DataAccessException e) {
-        logger.error("Retry failed: {}" , e.getMessage());
+    public CompletableFuture<List<Country>> recover(DataAccessException e) {
+        logger.error("Retry is failed: {}" , e.getMessage());
+        return CompletableFuture.failedFuture(e);
     }
-
-
 }

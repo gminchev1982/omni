@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface ShareService {
 
-    ResponseEntity<String> shareData(List<CountryShareDto> countryList) throws Exception;
+    ResponseEntity<String> shareData(List<CountryShareDto> countryShareDtos);
 }

@@ -1,6 +1,6 @@
 package com.minchev.omni.service;
 
-import com.minchev.omni.dto.CountryDto;
+import com.minchev.omni.entity.Country;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -10,5 +10,5 @@ public interface FileService {
 
     void storeFile(MultipartFile file);
 
-    CompletableFuture<List<CountryDto>> parseFileContent(MultipartFile file);
+    CompletableFuture<List<Country>> parseFileContent(MultipartFile file);
 }

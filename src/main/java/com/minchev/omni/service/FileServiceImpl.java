@@ -3,6 +3,7 @@ package com.minchev.omni.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.minchev.omni.dto.CountryDto;
+import com.minchev.omni.entity.Country;
 import com.minchev.omni.error.FileException;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.slf4j.Logger;
@@ -66,11 +67,11 @@ public class FileServiceImpl implements FileService {
      * @return CompletableFuture object
      */
     @Async
-    public CompletableFuture<List<CountryDto>> parseFileContent(MultipartFile file) {
+    public CompletableFuture<List<Country>> parseFileContent(MultipartFile file) {
         try {
             logger.info("Starting parser process.");
             final var countries =
-                    mapper.readValue(file.getInputStream(), new TypeReference<List<CountryDto>>() {});
+                    mapper.readValue(file.getInputStream(), new TypeReference<List<Country>>() {});
 
             return CompletableFuture.completedFuture(countries);
         } catch (IOException e) {

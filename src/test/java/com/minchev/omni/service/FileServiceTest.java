@@ -2,7 +2,7 @@ package com.minchev.omni.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.minchev.omni.dto.CountryDto;
+import com.minchev.omni.entity.Country;
 import com.minchev.omni.error.FileException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,12 +45,10 @@ public class FileServiceTest {
 
     @Test
     public void storeFile_ExceptionEmptyFile() throws IOException {
-
-        String jsonString = "[{\"name\": \"Yemen\", \"code\": \"YE\"}]";
-        MultipartFile multipartFile = new MockMultipartFile("sos.json", "".getBytes());
+        var file = new MockMultipartFile("sos.json", "".getBytes());
 
         FileException exception = assertThrows(FileException.class, () -> {
-                    fileService.storeFile(multipartFile);
+            fileService.storeFile(file);
         });
 
         assertEquals(exception.getMessage(), "file is empty");
@@ -77,16 +75,13 @@ public class FileServiceTest {
 
     @Test
     public void parseFileContent_done() throws ExecutionException, InterruptedException, IOException {
-        CountryDto country = new CountryDto();
+        Country country = new Country();
         country.setCode("YE");
         country.setName("Yemen");
 
-        String jsonString = "[{\"name\": \"Yemen\", \"code\": \"YE\"}]";
-        MultipartFile multipartFile = new MockMultipartFile("sos.json", jsonString.getBytes());
-
         when(mapper.readValue(any(InputStream.class), any(TypeReference.class))).thenReturn(List.of(country));
 
-        var result = fileService.parseFileContent(multipartFile);
+        var result = fileService.parseFileContent(mockMultipartFile());
 
         assertEquals(1, result.get().size());
         assertEquals(country.getName(), result.get().get(0).getName());
@@ -94,15 +89,17 @@ public class FileServiceTest {
 
     @Test
     public void parseFileContent_wrongData_Exception() throws IOException, ExecutionException, InterruptedException {
-        String jsonString = "[{\"name\": \"Yemen\", \"code\": \"YE\"}]";
-        MultipartFile multipartFile = new MockMultipartFile("sos.json", jsonString.getBytes());
-
         when(mapper.readValue(any(InputStream.class), any(TypeReference.class))).thenThrow(new IOException());
 
         FileException storageException = assertThrows(FileException.class, () -> {
-                fileService.parseFileContent(multipartFile);
+                fileService.parseFileContent(mockMultipartFile());
         });
 
         assertTrue(storageException != null);
+    }
+
+    private MultipartFile mockMultipartFile() {
+        String jsonString = "[{\"name\": \"Yemen\", \"code\": \"YE\"}]";
+        return new MockMultipartFile("sos.json", jsonString.getBytes());
     }
 }

@@ -1,27 +1,26 @@
 package com.minchev.omni.entity;
 
 import jakarta.persistence.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "country")
-public class Country {
-
+@Table(name = "scheduler")
+public class Scheduler {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column( nullable = false)
-    private String name;
-
-    @Column( nullable = false)
-    private String code;
+    @Column( nullable = false, unique = true)
+    private String key;
 
     private LocalDateTime updatedAt;
 
     private LocalDateTime createdAt;
 
+    private int currentPage;
 
     public Long getId() {
         return id;
@@ -31,20 +30,12 @@ public class Country {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getKey() {
+        return key;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public LocalDateTime getUpdatedAt() {
@@ -63,10 +54,18 @@ public class Country {
         this.createdAt = createdAt;
     }
 
+    public int getCurrentPage() {
+        return currentPage;
+    }
+
+    public void setCurrentPage(int currentPage) {
+        this.currentPage = currentPage;
+    }
+
     @PrePersist
     public void postPersist() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+       this.createdAt = LocalDateTime.now();
+       this.updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
@@ -74,12 +73,4 @@ public class Country {
         this.updatedAt = LocalDateTime.now();
     }
 
-
-    @Override
-    public String toString() {
-        return "Country{" +
-                "name='" + name + '\'' +
-                ", code='" + code + '\'' +
-                '}';
-    }
 }

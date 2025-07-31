@@ -1,13 +1,17 @@
 package com.minchev.omni.service;
 
 import com.minchev.omni.dto.CountryDto;
+import com.minchev.omni.dto.CountryShareDto;
 import com.minchev.omni.entity.Country;
+import com.minchev.omni.repository.CountryRepository;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public interface CountryService {
 
-    void saveCountriesAsync(List<CountryDto> countries);
+    CompletableFuture<List<Country>> saveCountriesAsync(List<Country> countries);
 
-    List<Country> getCountries();
+    List<CountryShareDto> getCountryShareList(Pageable pageable);
 }

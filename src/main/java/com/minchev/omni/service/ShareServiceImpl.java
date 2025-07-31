@@ -15,39 +15,22 @@ import java.util.List;
 @Service
 public class ShareServiceImpl implements ShareService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ShareServiceImpl.class);
-    private static final String HEADER_X_API_KEY = "x-api-key";
-
-    private final RestTemplate restTemplate;
     private final ShareConfigProperties properties;
+    private final HttpService httpService;
 
-    private HttpHeaders headers;
-    private HttpEntity<String> httpEntity;
-
-    public ShareServiceImpl(RestTemplate restTemplate, ShareConfigProperties properties) {
-        this.restTemplate = restTemplate;
+    public ShareServiceImpl(ShareConfigProperties properties, HttpService httpService) {
         this.properties = properties;
+        this.httpService = httpService;
+
     }
 
     /**
-     * send data to an external server
-     * @param countryList - list of {@link Country}
-     * @return - ResponseEntity<String>
-     * @throws - HttpServerErrorException
+     * get share data response
+     * @param countryShareDtos - list of share data
+     * @return responseEntity
      */
     @Override
-    public ResponseEntity<String> shareData(List<CountryShareDto> countryList) {
-        return call(HttpMethod.POST, httpEntity);
-    }
-
-    private ResponseEntity<String> call(HttpMethod httpMethod, HttpEntity<String> httpEntity) {
-        try {
-            return restTemplate.exchange(properties.getUrl(), httpMethod, httpEntity, String.class);
-        } catch (HttpServerErrorException e) {
-            logger.error("Server is not responded:" + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("server is not respond.");
-        }
+    public ResponseEntity<String> shareData(List<CountryShareDto> countryShareDtos) {
+        return httpService.callShareData(properties.getUrl(), properties.getKey(), HttpMethod.POST, countryShareDtos);
     }
 }
