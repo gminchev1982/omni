@@ -41,7 +41,7 @@ public class ShareScheduler {
     @Transactional
     void shareTask() {
 
-        var schedule = getScheduler();
+        var schedule = getSchedulerByKey(SCHEDULER_SHARE_KEY);
         var countries =
                 countryService.getCountryShareList(PageRequest.of(schedule.getCurrentPage(), PAGE_SIZE_COUNT,
                         Sort.by(SCHEDULER_SHARE_SORT).ascending()));
@@ -53,14 +53,15 @@ public class ShareScheduler {
                 schedule.setCurrentPage(schedule.getCurrentPage() + 1);
                 schedulerRepository.save(schedule);
             }
+
             logger.info("Scheduler shares countries : {} with response: {}", countries,  response);
         } else {
             logger.info("No found countries : {} ", countries);
         }
     }
 
-    private Scheduler getScheduler() {
-        Optional<Scheduler> optionalScheduler = schedulerRepository.findByKey(SCHEDULER_SHARE_KEY);
+    private Scheduler getSchedulerByKey(String schedule_key) {
+        Optional<Scheduler> optionalScheduler = schedulerRepository.findByKey(schedule_key);
 
         return optionalScheduler.isPresent() ? optionalScheduler.get() : new Scheduler(SCHEDULER_SHARE_KEY, PAGE_DEFAULT);
     }
