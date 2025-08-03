@@ -3,7 +3,9 @@ package com.minchev.omni.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.minchev.omni.entity.Country;
+import com.minchev.omni.entity.FileHistory;
 import com.minchev.omni.error.FileException;
+import com.minchev.omni.repository.FileHistoryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -13,7 +15,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -22,12 +23,14 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 
 public class FileServiceTest {
+
+    private static final String FILE_NAME = "sos.json";
+    private static final String FILE_CONTENT = "[{\"name\": \"Yemen\", \"code\": \"YE\"}]";
 
     @InjectMocks
     private FileServiceImpl fileService;
@@ -38,6 +41,9 @@ public class FileServiceTest {
     @Mock
     ObjectMapper mapper;
 
+    @Mock
+    private FileHistoryRepository storageRepository;
+
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
@@ -45,9 +51,9 @@ public class FileServiceTest {
 
     @Test
     public void storeFile_ExceptionEmptyFile() throws IOException {
-        var file = new MockMultipartFile("sos.json", "".getBytes());
+        var file = new MockMultipartFile(FILE_NAME, "".getBytes());
 
-        FileException exception = assertThrows(FileException.class, () -> {
+        var exception = assertThrows(FileException.class, () -> {
             fileService.storeFile(file);
         });
 
@@ -56,50 +62,61 @@ public class FileServiceTest {
 
     @Test
     public void storeFile_saved() throws IOException, NoSuchFieldException, IllegalAccessException {
-        String jsonString = "[{\"name\": \"Yemen\", \"code\": \"YE\"}]";
-        String nameFile = "sos.json";
 
-        MultipartFile multipartFile =
-                new MockMultipartFile(nameFile, nameFile, "text/plain", jsonString.getBytes());
+        var fileHistory  = mockFileHistory();
+        var multipartFile =
+                new MockMultipartFile(FILE_NAME, FILE_NAME, "text/plain", FILE_CONTENT.getBytes());
 
-        Field storageFolderField = FileServiceImpl.class.getDeclaredField("storageFolder");
+        var storageFolderField = FileServiceImpl.class.getDeclaredField("directory");
         storageFolderField.setAccessible(true);
         storageFolderField.set(fileService, tempDir.toString());
 
-        fileService.storeFile(multipartFile);
+        when(storageRepository.save(any(FileHistory.class))).thenReturn(fileHistory);
 
-        File file = new File(tempDir.toString() + "/" + "sos.json");
+        var result = fileService.storeFile(multipartFile);
 
-        assertTrue(file.isFile());
+        assertEquals(fileHistory.getNameOriginal(), result.getNameOriginal());
     }
 
     @Test
     public void parseFileContent_done() throws ExecutionException, InterruptedException, IOException {
-        Country country = new Country();
+        var country = new Country();
         country.setCode("YE");
         country.setName("Yemen");
 
-        when(mapper.readValue(any(InputStream.class), any(TypeReference.class))).thenReturn(List.of(country));
+        var fileHistory = mockFileHistory();
 
-        var result = fileService.parseFileContent(mockMultipartFile());
+        when(mapper.readValue(any(InputStream.class), any(TypeReference.class))).thenReturn(List.of(country));
+        when(storageRepository.save(any(FileHistory.class))).thenReturn(fileHistory);
+
+        var result = fileService.parseFileContent(mockMultipartFile(), fileHistory);
 
         assertEquals(1, result.get().size());
         assertEquals(country.getName(), result.get().get(0).getName());
+        assertEquals(country.getFileHistory(), result.get().get(0).getFileHistory());
     }
 
     @Test
     public void parseFileContent_wrongData_Exception() throws IOException, ExecutionException, InterruptedException {
         when(mapper.readValue(any(InputStream.class), any(TypeReference.class))).thenThrow(new IOException());
 
-        FileException storageException = assertThrows(FileException.class, () -> {
-                fileService.parseFileContent(mockMultipartFile());
+        var storageException = assertThrows(FileException.class, () -> {
+            fileService.parseFileContent(mockMultipartFile(), mockFileHistory());
         });
 
         assertTrue(storageException != null);
     }
 
     private MultipartFile mockMultipartFile() {
-        String jsonString = "[{\"name\": \"Yemen\", \"code\": \"YE\"}]";
-        return new MockMultipartFile("sos.json", jsonString.getBytes());
+        return new MockMultipartFile(FILE_NAME, FILE_CONTENT.getBytes());
     }
+
+    private FileHistory mockFileHistory() {
+        var fileHistory = new FileHistory();
+        fileHistory.setId(1L);
+        fileHistory.setNameOriginal(FILE_NAME);
+
+        return fileHistory;
+    }
+
 }

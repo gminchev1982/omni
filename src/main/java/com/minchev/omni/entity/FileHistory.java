@@ -1,13 +1,13 @@
 package com.minchev.omni.entity;
 
+
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "country")
-public class Country {
-
+@Table(name = "file_history")
+public class FileHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -16,15 +16,11 @@ public class Country {
     private String name;
 
     @Column( nullable = false)
-    private String code;
+    private String nameOriginal;
 
     private LocalDateTime updatedAt;
 
     private LocalDateTime createdAt;
-
-    @ManyToOne(fetch =FetchType.LAZY)
-    @JoinColumn(name="file_history_id", nullable=false)
-    private FileHistory fileHistory;
 
     public Long getId() {
         return id;
@@ -42,12 +38,12 @@ public class Country {
         this.name = name;
     }
 
-    public String getCode() {
-        return code;
+    public String getNameOriginal() {
+        return nameOriginal;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setNameOriginal(String nameOriginal) {
+        this.nameOriginal = nameOriginal;
     }
 
     public LocalDateTime getUpdatedAt() {
@@ -66,14 +62,6 @@ public class Country {
         this.createdAt = createdAt;
     }
 
-    public FileHistory getFileHistory() {
-        return fileHistory;
-    }
-
-    public void setFileHistory(FileHistory fileHistory) {
-        this.fileHistory = fileHistory;
-    }
-
     @PrePersist
     public void postPersist() {
         this.createdAt = LocalDateTime.now();
@@ -85,12 +73,4 @@ public class Country {
         this.updatedAt = LocalDateTime.now();
     }
 
-
-    @Override
-    public String toString() {
-        return "Country{" +
-                "name='" + name + '\'' +
-                ", code='" + code + '\'' +
-                '}';
-    }
 }

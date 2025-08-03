@@ -33,8 +33,8 @@ public class FileController {
     public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) {
 
         try {
-            fileService.storeFile(file);
-            countryService.saveCountriesAsync(fileService.parseFileContent(file).get());
+            var storage = fileService.storeFile(file);
+            countryService.saveCountriesAsync(fileService.parseFileContent(file, storage).get());
 
             return ResponseEntity.ok("File uploaded successfully: " + file.getOriginalFilename());
         } catch (Exception e) {

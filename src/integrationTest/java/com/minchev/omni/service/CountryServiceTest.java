@@ -1,6 +1,7 @@
 package com.minchev.omni.service;
 
 import com.minchev.omni.entity.Country;
+import com.minchev.omni.entity.FileHistory;
 import com.minchev.omni.repository.CountryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ public class CountryServiceTest {
 
     @Test
     public void saveCountriesAsync_startRetryProcess() throws ExecutionException, InterruptedException {
-        Country country = new Country();
+        var country = new Country();
         country.setCode(null);
         country.setName(null);
 
@@ -61,14 +62,19 @@ public class CountryServiceTest {
 
     @Test
     public void saveCountriesAsync_withCorrectData_return() throws ExecutionException, InterruptedException {
-        Country country = new Country();
+
+        var fileHistory = new FileHistory();
+        fileHistory.setId(1L);
+        fileHistory.setNameOriginal("sos.json");
+
+        var country = new Country();
         country.setCode("Sps");
         country.setName("sps");
+        country.setFileHistory(fileHistory);
 
         var exp =  countryService.saveCountriesAsync(List.of(country));
         exp.join();
 
         assertEquals(exp.get().size(), 1);
     }
-
 }
