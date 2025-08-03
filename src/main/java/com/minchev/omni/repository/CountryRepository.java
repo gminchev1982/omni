@@ -17,7 +17,4 @@ public interface CountryRepository extends JpaRepository<Country, Long> {
     @Query("SELECT new com.minchev.omni.dto.CountryShareDto(c.name) FROM Country c")
     List<CountryShareDto> getCountryShareList(Pageable pageable);
 
-
-
-
 }

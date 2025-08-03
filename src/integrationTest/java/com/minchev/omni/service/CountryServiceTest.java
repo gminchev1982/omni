@@ -5,18 +5,15 @@ import com.minchev.omni.entity.FileHistory;
 import com.minchev.omni.repository.CountryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.springframework.test.context.junit4.SpringRunner;
+
 
 import java.util.List;
 import java.util.concurrent.CompletionException;
@@ -31,7 +28,6 @@ import static org.mockito.Mockito.verify;
 @EnableRetry
 @EnableAsync
 @ActiveProfiles("test")
-@RunWith(SpringRunner.class)
 public class CountryServiceTest {
 
     @Autowired
@@ -77,4 +73,5 @@ public class CountryServiceTest {
 
         assertEquals(exp.get().size(), 1);
     }
+
 }

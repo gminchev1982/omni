@@ -3,9 +3,9 @@ package com.minchev.omni.service;
 import com.minchev.omni.dto.CountryShareDto;
 import com.minchev.omni.entity.Country;
 import com.minchev.omni.repository.CountryRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -15,9 +15,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
@@ -79,4 +77,5 @@ public class CountryServiceTest {
 
         return country;
     }
+
 }
