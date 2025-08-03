@@ -17,7 +17,13 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -56,5 +62,23 @@ public class FileControllerTest {
         mockMvc.perform(multipart("/upload")
                 .file(file)).andExpect(status().is5xxServerError());
     }
+
+    @Test
+    public void handleFileUpload_ok() throws Exception {
+
+        var file = new MockMultipartFile(
+                "file",
+                "fail.txt",
+                "text/plain",
+                "".getBytes()
+        );
+
+        when(fileService.storeFile(any(MultipartFile.class))).thenReturn(new FileHistory());
+        when(fileService.parseFileContent(any(MultipartFile.class), any(FileHistory.class))).thenReturn(CompletableFuture.completedFuture(List.of(new Country())));
+
+        mockMvc.perform(multipart("/upload")
+                .file(file)).andExpect(status().isOk());
+    }
+
 
 }
