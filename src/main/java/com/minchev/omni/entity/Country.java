@@ -1,9 +1,17 @@
 package com.minchev.omni.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
+@ToString
+@Builder
 @Entity
 @Table(name = "country")
 public class Country {
@@ -25,54 +33,6 @@ public class Country {
     @ManyToOne(fetch =FetchType.LAZY)
     @JoinColumn(name="file_history_id", nullable=false)
     private FileHistory fileHistory;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public FileHistory getFileHistory() {
-        return fileHistory;
-    }
-
-    public void setFileHistory(FileHistory fileHistory) {
-        this.fileHistory = fileHistory;
-    }
 
     @PrePersist
     public void postPersist() {

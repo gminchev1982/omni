@@ -70,12 +70,7 @@ public class CountryServiceTest {
     }
 
     private Country mockCountry() {
-        Country country = new Country();
-        country.setId(1L);
-        country.setCode("aa");
-        country.setName("bbb");
-
-        return country;
+        return Country.builder().id(1L).code("aa").name("Ara").build();
     }
 
 }

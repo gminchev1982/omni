@@ -2,9 +2,14 @@ package com.minchev.omni.entity;
 
 
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
-
+@Getter
+@Setter
+@Builder
 @Entity
 @Table(name = "file_history")
 public class FileHistory {
@@ -21,46 +26,6 @@ public class FileHistory {
     private LocalDateTime updatedAt;
 
     private LocalDateTime createdAt;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getNameOriginal() {
-        return nameOriginal;
-    }
-
-    public void setNameOriginal(String nameOriginal) {
-        this.nameOriginal = nameOriginal;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 
     @PrePersist
     public void postPersist() {

@@ -78,9 +78,7 @@ public class FileServiceTest {
 
     @Test
     public void parseFileContent_done() throws ExecutionException, InterruptedException, IOException {
-        var country = new Country();
-        country.setCode("YE");
-        country.setName("Yemen");
+        var country = Country.builder().code("YE").name("Yemen").build();
 
         var fileHistory = mockFileHistory();
 
@@ -110,11 +108,7 @@ public class FileServiceTest {
     }
 
     private FileHistory mockFileHistory() {
-        var fileHistory = new FileHistory();
-        fileHistory.setId(1L);
-        fileHistory.setNameOriginal(FILE_NAME);
-
-        return fileHistory;
+        return FileHistory.builder().id(1L).nameOriginal(FILE_NAME).build();
     }
 
 }

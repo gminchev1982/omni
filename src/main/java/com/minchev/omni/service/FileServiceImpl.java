@@ -99,11 +99,7 @@ public class FileServiceImpl implements FileService {
 
     @Transactional
     private FileHistory saveFileHistory(String originalFilename, String fileName) {
-        FileHistory fileHistory = new FileHistory();
-        fileHistory.setNameOriginal(originalFilename);
-        fileHistory.setName(fileName);
-
-        return fileHistoryRepository.save(fileHistory);
+        return fileHistoryRepository.save(FileHistory.builder().name(fileName).nameOriginal(originalFilename).build());
     }
 
     private String generateFileName(String originalFilename) {

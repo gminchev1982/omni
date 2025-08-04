@@ -38,9 +38,6 @@ public class FileControllerTest {
     @Mock
     private FileServiceImpl fileService;
 
-    @Mock
-    private ObjectMapper mapper;
-
     private MockMvc mockMvc;
 
     @BeforeEach
@@ -73,12 +70,12 @@ public class FileControllerTest {
                 "".getBytes()
         );
 
-        when(fileService.storeFile(any(MultipartFile.class))).thenReturn(new FileHistory());
-        when(fileService.parseFileContent(any(MultipartFile.class), any(FileHistory.class))).thenReturn(CompletableFuture.completedFuture(List.of(new Country())));
+        when(fileService.storeFile(any(MultipartFile.class))).thenReturn(FileHistory.builder().build());
+        when(fileService.parseFileContent(any(MultipartFile.class), any(FileHistory.class)))
+                .thenReturn(CompletableFuture.completedFuture(List.of(Country.builder().build())));
 
         mockMvc.perform(multipart("/upload")
                 .file(file)).andExpect(status().isOk());
     }
-
 
 }

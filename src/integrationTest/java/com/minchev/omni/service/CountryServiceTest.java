@@ -43,9 +43,7 @@ public class CountryServiceTest {
 
     @Test
     public void saveCountriesAsync_startRetryProcess() throws ExecutionException, InterruptedException {
-        var country = new Country();
-        country.setCode(null);
-        country.setName(null);
+        var country = Country.builder().build();
 
         var exception = assertThrows(CompletionException.class, () -> {
             var exp =  countryService.saveCountriesAsync(List.of(country));
@@ -59,14 +57,9 @@ public class CountryServiceTest {
     @Test
     public void saveCountriesAsync_withCorrectData_return() throws ExecutionException, InterruptedException {
 
-        var fileHistory = new FileHistory();
-        fileHistory.setId(1L);
-        fileHistory.setNameOriginal("sos.json");
+        var fileHistory = FileHistory.builder().id(1L).nameOriginal("sos.json").build();
 
-        var country = new Country();
-        country.setCode("Sps");
-        country.setName("sps");
-        country.setFileHistory(fileHistory);
+        var country = Country.builder().code("Sps").name("sps").fileHistory(fileHistory).build();
 
         var exp =  countryService.saveCountriesAsync(List.of(country));
         exp.join();
